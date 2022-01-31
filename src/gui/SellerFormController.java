@@ -1,6 +1,8 @@
 package gui;
 
 import java.net.URL;
+import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -125,11 +127,30 @@ public class SellerFormController implements Initializable {
 		ValidationException exception = new ValidationException("Validation Erro");
 
 		obj.setId(Utils.tryParseToInt(txtId.getText()));
+		
 		if (txtName.getText() == null || txtName.getText().trim().equals("")) {
 			exception.addErros("name", "Field can't be empty");
 		}
 		obj.setName(txtName.getText());
-
+		
+		if (txtEmail.getText() == null || txtEmail.getText().trim().equals("")) {
+			exception.addErros("email", "Field can't be empty");
+		}
+		obj.setEmail(txtEmail.getText());
+		
+		if(dpBirthDate.getValue() == null) {
+			exception.addErros("brithDate", "Field can't be empty");
+		} else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+	        obj.setBrithDate(Date.from(instant));
+		}
+        
+        if(txtBaseSalary.getText() == null || txtBaseSalary.getText().trim().equals("")) {
+        	exception.addErros("baseSalary", "Field can't be empty");
+        }
+        obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+        obj.setDepartment(comboBoxDepartment.getValue());
+        
 		if (exception.getErros().size() > 0) {
 			throw exception;
 		}
@@ -189,10 +210,12 @@ public class SellerFormController implements Initializable {
 
 	private void setErroMessage(Map<String, String> erros) {
 		Set<String> fields = erros.keySet();
-
-		if (fields.contains("name")) {
-			lblErroName.setText(erros.get("name"));
-		}
+			
+		lblErroName.setText((fields.contains("name") ? erros.get("name") : ""));
+		lblErroEmail.setText((fields.contains("email") ? erros.get("email") : ""));
+		lblErroBirthDate.setText((fields.contains("brithDate") ? erros.get("brithDate") : ""));
+		lblErroBaseSalary.setText((fields.contains("baseSalary") ? erros.get("baseSalary") : ""));
+		
 	}
 
 	private void initializeComboBoxDepartment() {
